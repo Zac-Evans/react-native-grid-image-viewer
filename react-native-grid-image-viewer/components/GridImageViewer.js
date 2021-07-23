@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {
   View,
   StyleSheet,
@@ -17,14 +17,38 @@ import MoveRight from './MoveRight';
 
 const GridImageView = ({
   data,
+  dataIndex,
   headers = null,
   renderGridImage = null,
   renderModalImage = null,
   transparent = 0.8,
   heightOfGridImage = Dimensions.get('window').height / 5.5,
 }) => {
-  const [modal, setModal] = useState({visible: false, data: 0});
-  const ref = useRef();
+  function useHookWithRefCallback() {
+    const ref = useRef(null)
+    const setRef = useCallback(node => {
+      if (ref.current) {
+        // Make sure to cleanup any events/references added to the last instance
+      
+      }
+      
+      if (node) {
+       
+        // Check if a node is actually passed. Otherwise node would be null.
+        // You can now do what you need to, addEventListeners, measure, etc.
+      }
+      
+      // Save a reference to the node
+      ref.current = node
+    }, [])
+    
+    return [setRef]
+  }
+
+
+  const [modal, setModal] = useState({visible: false});
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [ref] = useHookWithRefCallback()
   var key = 0;
 
   const {StatusBarManager} = NativeModules;
@@ -83,12 +107,12 @@ const GridImageView = ({
         transparent={true}
         visible={modal.visible}
         onRequestClose={() => {
-          setModal({visible: false, data: 0});
+          setModal({visible: false});
         }}>
         <Component />
 
-        <View style={styles.move_left_view}>
-          <TouchableOpacity
+        {/* <View style={styles.move_left_view}> */}
+          {/* <TouchableOpacity
             onPress={() => {
               if (modal.data - 1 >= 0) {
                 setTimeout(() => {
@@ -102,20 +126,20 @@ const GridImageView = ({
               }
             }}>
             <MoveLeft />
-          </TouchableOpacity>
-        </View>
+          </TouchableOpacity> */}
+        {/* </View> */}
 
         <View style={{...styles.cross, top: height + 5}}>
           <TouchableOpacity
             onPress={() => {
-              setModal({visible: false, data: 0});
+              setModal({visible: false});
             }}>
             <Cross />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.move_right_view}>
-          <TouchableOpacity
+        {/* <View style={styles.move_right_view}> */}
+          {/* <TouchableOpacity
             onPress={() => {
               if (modal.data + 1 < data.length) {
                 setTimeout(() => {
@@ -129,8 +153,8 @@ const GridImageView = ({
               }
             }}>
             <MoveRight />
-          </TouchableOpacity>
-        </View>
+          </TouchableOpacity> */}
+        {/* </View> */}
       </Modal>
 
       <FlatList
@@ -146,14 +170,14 @@ const GridImageView = ({
                 {data.length > index * 3 ? (
                   <TouchableOpacity
                     onPress={() => {
-                      setModal({visible: true, data: index * 3});
-
+                      setModal({visible: true});
+                      setCurrentIndex(index)
                       setTimeout(() => {
                         ref.current.scrollTo({
-                          x: Dimensions.get('window').width * index * 3,
+                          x: Dimensions.get('window').width * currentIndex * 3,
                           y: 0,
                           animated: false,
-                        });
+                        })
                       }, 1);
                     }}
                     style={[styles.unit_item, {height: heightOfGridImage}]}>
@@ -179,7 +203,7 @@ const GridImageView = ({
                 {data.length > index * 3 + 1 ? (
                   <TouchableOpacity
                     onPress={() => {
-                      setModal({visible: true, data: index * 3 + 1});
+                      setModal({visible: true});
 
                       setTimeout(() => {
                         ref.current.scrollTo({
@@ -212,7 +236,7 @@ const GridImageView = ({
                 {data.length > index * 3 + 2 ? (
                   <TouchableOpacity
                     onPress={() => {
-                      setModal({visible: true, data: index * 3 + 2});
+                      setModal({visible: true});
 
                       setTimeout(() => {
                         ref.current.scrollTo({
